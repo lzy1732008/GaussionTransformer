@@ -12,7 +12,7 @@ from sklearn import metrics
 import os
 from Model import GaussionTransformer
 from data_load import *
-from hyperparams import Hyperparams as hp
+import hyperparams as hp
 
 envPath = 'resource/inputs.json'
 

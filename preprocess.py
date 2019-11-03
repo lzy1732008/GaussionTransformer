@@ -38,13 +38,13 @@ def setUp_charEmbedding(vocabs):
                                  newshape=[len(vocabs),hp.Hyperparams.char_dimension])
     vocabs_dict = {}
     for i, c in enumerate(vocabs):
-        vocabs_dict[c] = '\t'.join(map(str,embedding_table[i]))
+        vocabs_dict[c] = ' '.join(map(str,embedding_table[i]))
 
-    with open('resource/char_embedding.msgpack','wb') as fw:
-        msgpack.pack(vocabs_dict,fw)
+    with open('resource/char_embedding.msgpack','w',encoding='utf-8') as fw:
+        json.dump(vocabs_dict,fw)
 
-    with open('resource/char_embedding.msgpack', 'rb') as fr:
-        vocab_ = msgpack.load(fr)
+    with open('resource/char_embedding.msgpack', 'r',encoding='utf-8') as fr:
+        vocab_ = json.load(fr)
         assert len(vocab_.keys()) == len(vocabs), ValueError("The number of read msgpack is not equal to inital number, that is :{0}".format(len((vocab_.keys()))))
 
 # sourcePath = 'resource/corpus.txt'
@@ -60,8 +60,8 @@ def setUp_inputs(trainPath = None, valPath = None, testPath = None):
     charVocab = charEmbedding.keys()
     assert len(charVocab) == hp.Hyperparams.char_vocab_size, ValueError('the number of char vocab is wrong, {0}'.format(len(charVocab)))
 
-    f_word = open('resource/word_embedding.msgpack', 'rb')
-    wordEmbedding = msgpack.load(f_word,encoding='utf-8')
+    f_word = open('resource/word_embedding.json', 'r', encoding='utf-8')
+    wordEmbedding = json.load(f_word)
     if '<UNK>' not in wordEmbedding.keys():
         wordEmbedding['<UNK>'] = '\t'.join(['0' for _ in range(hp.Hyperparams.word_dimension)])
     wordVocab = wordEmbedding.keys()
@@ -70,7 +70,7 @@ def setUp_inputs(trainPath = None, valPath = None, testPath = None):
     assert len(wordVocab) == hp.Hyperparams.word_vocab_size, ValueError('the number of char vocab is wrong, {0}'.format(len(wordVocab)))
 
 
-    # fw = open('resource/inputs.json', 'w',encoding='utf-8')
+    fw = open('resource/inputs.json', 'w',encoding='utf-8')
     train = ""
     test = ""
     val = ""
@@ -81,7 +81,7 @@ def setUp_inputs(trainPath = None, valPath = None, testPath = None):
     if valPath:
        val = _setUp_inputs_(valPath, wordEmbedding, wordVocab, charEmbedding, charVocab)
     env = {'train': train, 'test': test, 'val': val}
-    # json.dump(env, fw)
+    json.dump(env, fw)
 
 
 def _setUp_inputs_(sourcePath, wordEmbedding, wordVocab, charEmbedding,charVocab):
@@ -143,7 +143,7 @@ def processWord(word, word_embedding, vocabs):
 
 
 def buildWordEembeddingFile():
-    fw = open('resource/word_embedding.msgpack', 'wb')
+    fw = open('resource/word_embedding.json', 'w',encoding='utf-8')
 
     with open('resource/vectors_w2v.txt', 'r', encoding='utf-8') as f:
         lines = f.readlines()
@@ -153,7 +153,7 @@ def buildWordEembeddingFile():
             if line != "":
                 units = line.split()
                 word = units[0]
-                vector = str(units[1:]).split()
+                vector = units[1:]
                 assert len(vector) == hp.Hyperparams.word_dimension, ValueError('vector dimension is wrong, that is {0}'.format(len(vector)))
                 w2v_dict[word] = '\t'.join(vector)
 
@@ -161,7 +161,7 @@ def buildWordEembeddingFile():
             w2v_dict['<UNK>'] = '\t'.join(['0' for _ in range(hp.Hyperparams.word_dimension)])
 
         assert '<UNK>' in w2v_dict.keys(), ValueError('space and unk not in word dict')
-        msgpack.dump(w2v_dict, fw)
+        json.dump(w2v_dict, fw)
 
 # buildWordEembeddingFile()
 # trainPath = 'resource/train-原始.txt'

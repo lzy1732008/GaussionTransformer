@@ -14,7 +14,7 @@ class Hyperparams:
     source_test = 'corpora/IWSLT16.TED.tst2014.de-en.de.xml'
     target_test = 'corpora/IWSLT16.TED.tst2014.de-en.en.xml'
     char_vocab_size = 4594 # *
-    word_vocab_size = 97506
+    word_vocab_size = 97505
     char_dimension = 30
     word_dimension = 128
     postion_dimension = 120

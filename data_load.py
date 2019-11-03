@@ -69,10 +69,10 @@ def processInitData(data):
         input_a, input_b, target_y = sample[0],sample[1],int(sample[2])
         a_words, a_chars = input_a['word_input'], input_a['char_input']
         b_words, b_chars = input_b['word_input'], input_b['char_input']
-        a_data_word.append(list(map(lambda x:getVector(x), a_words)))
-        a_data_char.append(list(map(lambda x:getVector(x), a_chars)))
-        b_data_word.append(list(map(lambda x:getVector(x), b_words)))
-        b_data_char.append(list(map(lambda x:getVector(x), b_chars)))
+        a_data_word.append(list(map(lambda x:prep.getVector(x), a_words)))
+        a_data_char.append(list(map(lambda x:prep.getVector(x), a_chars)))
+        b_data_word.append(list(map(lambda x:prep.getVector(x), b_words)))
+        b_data_char.append(list(map(lambda x:prep.getVector(x), b_chars)))
         if target_y == 1:
             y.append([0,1])
         else:
@@ -86,13 +86,13 @@ def processInitData(data):
 
 
 
-def getVector(vectorStr):
-    vectorStr = vectorStr[1:-1]
-    vectorStr = str(vectorStr).replace(',','')
-    vectorStr = str(vectorStr).replace('\'','')
-    vectors = vectorStr.split('\t')
-    vectors = list(map(float, map(lambda x: x.strip(), filter(lambda x: x.strip() != '', vectors))))
-    assert len(vectors) == hp.Hyperparams.char_dimension or len(vectors) == hp.Hyperparams.word_dimension, ValueError("wrong dimension:{0}".format(len(vectors)))
-    return vectors
+# def getVector(vectorStr):
+#     vectorStr = vectorStr[1:-1]
+#     vectorStr = str(vectorStr).replace(',','')
+#     vectorStr = str(vectorStr).replace('\'','')
+#     vectors = vectorStr.split('\t')
+#     vectors = list(map(float, map(lambda x: x.strip(), filter(lambda x: x.strip() != '', vectors))))
+#     assert len(vectors) == hp.Hyperparams.char_dimension or len(vectors) == hp.Hyperparams.word_dimension, ValueError("wrong dimension:{0}".format(len(vectors)))
+#     return vectors
 
 

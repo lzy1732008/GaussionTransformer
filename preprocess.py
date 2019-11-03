@@ -164,10 +164,10 @@ def buildWordEembeddingFile():
         msgpack.dump(w2v_dict, fw)
 
 # buildWordEembeddingFile()
-trainPath = 'resource/train-原始.txt'
-valPath = 'resource/val-原始.txt'
-testPath = 'resource/test-原始.txt'
-setUp_inputs(trainPath=trainPath, valPath=valPath, testPath=testPath)
+# trainPath = 'resource/train-原始.txt'
+# valPath = 'resource/val-原始.txt'
+# testPath = 'resource/test-原始.txt'
+# setUp_inputs(trainPath=trainPath, valPath=valPath, testPath=testPath)
 
 
 

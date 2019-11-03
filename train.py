@@ -16,7 +16,7 @@ from hyperparams import Hyperparams as hp
 
 envPath = 'resource/inputs.msgpack'
 
-save_dir = 'resource/model/GaussionTransformer'  #修改处
+save_dir = 'result/model/GaussionTransformer'  #修改处
 times = '1'
 save_path = os.path.join(save_dir,times+'/checkpoints/best_validation')
 tensorboard_dir = os.path.join(save_dir,times+'/tensorboard')

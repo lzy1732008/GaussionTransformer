@@ -92,6 +92,7 @@ def getVector(vectorStr):
     vectorStr = str(vectorStr).replace('\'','')
     vectors = vectorStr.split('\t')
     vectors = list(map(float, map(lambda x: x.strip(), filter(lambda x: x.strip() != '', vectors))))
+    assert len(vectors) == hp.Hyperparams.char_dimension or len(vectors) == hp.Hyperparams.word_dimension, ValueError("wrong dimension:{0}".format(len(vectors)))
     return vectors
 
 

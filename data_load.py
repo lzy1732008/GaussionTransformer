@@ -11,6 +11,7 @@ import msgpack
 import preprocess as prep
 import tensorflow.contrib.keras as kr
 import hyperparams as hp
+import json
 
 def get_batch_data_test(a_word,a_char,b_word,b_char,y, batch_size = 64):
     data_len = len(a_word)
@@ -44,8 +45,8 @@ def get_batch_data(a_word,a_char,b_word,b_char,y,batch_size = 64):
 
 
 def data_load(envPath):
-    with open(envPath,'rb') as fr:
-        env = msgpack.load(fr,encoding='utf-8')
+    with open(envPath,'r',encoding='utf-8') as fr:
+        env = json.load(fr)
 
     train_data = env['train']
     test_data = env['test']
@@ -65,7 +66,7 @@ def processInitData(data):
 
     for sample in data:
         assert len(sample) == 3, ValueError("the number of elemengs in this sample is {0}".format(len(sample)))
-        input_a, input_b, target_y = sample[0],sample[1],int(sample[3])
+        input_a, input_b, target_y = sample[0],sample[1],int(sample[2])
         a_words, a_chars = input_a['word_input'], input_a['char_input']
         b_words, b_chars = input_b['word_input'], input_b['char_input']
         a_data_word.append(list(map(lambda x:prep.getVector(x), a_words)))

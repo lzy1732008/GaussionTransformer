@@ -14,7 +14,7 @@ from Model import GaussionTransformer
 from data_load import *
 from hyperparams import Hyperparams as hp
 
-envPath = 'resource/inputs.msgpack'
+envPath = 'resource/inputs.json'
 
 save_dir = 'result/model/GaussionTransformer'  #修改处
 times = '1'
@@ -181,7 +181,7 @@ def test():
             model.inputX_char: test_x1_char[start_id:end_id],
             model.inputY_word: test_x2_word[start_id:end_id],
             model.inputY_word: test_x2_char[start_id:end_id],
-            model.y:  test_y,
+            model.y: test_y,
             model.dropout_rate: 1.0   #这个表示测试时不使用dropout对神经元过滤
         }
         y_pred_cls[start_id:end_id] = session.run(model.pred_y, feed_dict=feed_dict)   #将所有批次的预测结果都存放在y_pred_cls中

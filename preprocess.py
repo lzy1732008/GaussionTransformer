@@ -51,7 +51,7 @@ def setUp_charEmbedding(vocabs):
 # build_CharVocab(sourcePath)
 
 #step2 prepare char_input
-def setUp_inputs(trainPath, valPath, testPath):
+def setUp_inputs(trainPath = None, valPath = None, testPath = None):
     #read word and char info
     f_char = open('resource/char_embedding.msgpack','rb')
     charEmbedding = msgpack.load(f_char,encoding='utf-8')
@@ -70,12 +70,18 @@ def setUp_inputs(trainPath, valPath, testPath):
     assert len(wordVocab) == hp.Hyperparams.word_vocab_size, ValueError('the number of char vocab is wrong, {0}'.format(len(wordVocab)))
 
 
-    fw = open('resource/inputs.msgpack', 'wb')
-    train = _setUp_inputs_(trainPath,wordEmbedding, wordVocab, charEmbedding,charVocab)
-    test = _setUp_inputs_(testPath, wordEmbedding, wordVocab, charEmbedding, charVocab)
-    val = _setUp_inputs_(valPath, wordEmbedding, wordVocab, charEmbedding, charVocab)
+    fw = open('resource/inputs.json', 'w',encoding='utf-8')
+    train = ""
+    test = ""
+    val = ""
+    if trainPath:
+       train = _setUp_inputs_(trainPath,wordEmbedding, wordVocab, charEmbedding,charVocab)
+    if testPath:
+       test = _setUp_inputs_(testPath, wordEmbedding, wordVocab, charEmbedding, charVocab)
+    if valPath:
+       val = _setUp_inputs_(valPath, wordEmbedding, wordVocab, charEmbedding, charVocab)
     env = {'train': train, 'test': test, 'val': val}
-    msgpack.dump(env, fw)
+    json.dump(env, fw)
 
 
 def _setUp_inputs_(sourcePath, wordEmbedding, wordVocab, charEmbedding,charVocab):
@@ -158,10 +164,10 @@ def buildWordEembeddingFile():
         msgpack.dump(w2v_dict, fw)
 
 # buildWordEembeddingFile()
-# trainPath = 'resource/train-原始.txt'
-# valPath = 'resource/val-原始.txt'
-# testPath = 'resource/test-原始.txt'
-# setUp_inputs(trainPath,valPath,testPath)
+trainPath = 'resource/train-原始.txt'
+valPath = 'resource/val-原始.txt'
+testPath = 'resource/test-原始.txt'
+setUp_inputs(trainPath=trainPath, valPath=valPath, testPath=testPath)
 
 
 

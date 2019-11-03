@@ -82,7 +82,7 @@ def processInitData(data):
     a_data_word = kr.preprocessing.sequence.pad_sequences(np.array(a_data_word), hp.Hyperparams.X_maxlen)
     b_data_char = kr.preprocessing.sequence.pad_sequences(np.array(b_data_char), hp.Hyperparams.Y_maxLen)
     b_data_word = kr.preprocessing.sequence.pad_sequences(np.array(b_data_word), hp.Hyperparams.Y_maxLen)
-    return a_data_char,a_data_word,b_data_char,b_data_word, y
+    return a_data_char,a_data_word,b_data_char,b_data_word, np.array(y)
 
 
 

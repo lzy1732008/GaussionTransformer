@@ -14,8 +14,6 @@ from Model import GaussionTransformer
 from data_load import *
 import hyperparams as hp
 
-envPath = 'resource/inputs.json'
-
 save_dir = 'result/model/GaussionTransformer'  #修改处
 times = '1'
 save_path = os.path.join(save_dir,times+'/checkpoints/best_validation')
@@ -45,17 +43,18 @@ def feed_data(a_word,a_char,b_word,b_char,y_batch,dropout_rate):
         model.y: y_batch,
         model.dropout_rate: dropout_rate,
     }
+
     return feed_dict
 
 
 def evaluate(sess,a_word,a_char,b_word,b_char,y):
     """评估在某一数据上的准确率和损失"""
     data_len = len(a_word)
-    batch_eval = get_batch_data_test(a_word, a_char, b_word, b_char,y, 128)
+    batch_eval = get_batch_data_test(a_word, a_char, b_word, b_char,y, hp.Hyperparams.batch_size)
     total_loss = 0.0
     total_acc = 0.0
     for a_word_batch, a_char_batch, b_word_batch, b_char_batch,y_batch in batch_eval:
-        batch_len = len(a_char)
+        batch_len = len(a_char_batch)
         feed_dict = feed_data(a_word_batch, a_char_batch, b_word_batch, b_char_batch,y_batch,1.0)
         loss, acc = sess.run([model.loss, model.acc], feed_dict=feed_dict)
         total_loss += loss * batch_len
@@ -85,10 +84,13 @@ def train():
     print("Loading training and validation data...")
     # 载入训练集与验证集
     start_time = time.time()
-    train_data, test_data, val_data = data_load(envPath)
+    train_data, test_data, val_data = data_load()
 
     train_x1_word, train_x1_char, train_x2_word, train_x2_char, train_y = train_data
     val_x1_word, val_x1_char, val_x2_word, val_x2_char, val_y = val_data
+
+    print('train len',len(train_x1_char))
+    print('val_len',len(val_x1_char))
 
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
@@ -121,8 +123,10 @@ def train():
                 # 每多少轮次输出在训练集和验证集上的性能
 
                 feed_dict[model.dropout_rate] = 1.0
-                loss_train, acc_train = session.run([model.loss, model.acc], feed_dict=feed_dict)
+                loss_train, acc_train,pre_y, logit, true_y, encodings = session.run([model.loss, model.acc,model.pred_y,model.logit,model.y,model.encoding_1], feed_dict=feed_dict)
                 loss_val, acc_val = evaluate(session, val_x1_word, val_x1_char, val_x2_word, val_x2_char, val_y)  # 验证当前会话中的模型的loss和acc
+                # for pre_y_, logit_, true_y_ in zip(pre_y,logit,true_y):
+                #     print(pre_y_, logit_, true_y_)
 
 
                 if acc_val > best_acc_val:
@@ -135,8 +139,8 @@ def train():
                     improved_str = ''
 
                 time_dif = get_time_dif(start_time)
-                msg = 'Iter: {0:>6}, Train Loss: {1:>6.2}, Train Acc: {2:>7.2%},' \
-                      + ' Val Loss: {3:>6.2}, Val Acc: {4:>7.2%}, Time: {5} {6}'
+                msg = 'Iter: {0}, Train Loss: {1}, Train Acc: {2},' \
+                      + ' Val Loss: {3}, Val Acc: {4}, Time: {5} {6}'
                 print(msg.format(total_batch, loss_train, acc_train, loss_val, acc_val, time_dif, improved_str))
 
             session.run(model.optim, feed_dict=feed_dict)  # 运行优化
@@ -153,7 +157,7 @@ def train():
 def test():
     print("Loading test data...")
     start_time = time.time()
-    train_data, test_data, val_data = data_load(envPath)
+    test_data = data_load_test()
     test_x1_word, test_x1_char, test_x2_word, test_x2_char, test_y = test_data
 
 
@@ -167,7 +171,7 @@ def test():
     msg = 'Test Loss: {0:>6.2}, Test Acc: {1:>7.2%}'
     print(msg.format(loss_test, acc_test))
 
-    batch_size = 128
+    batch_size = hp.Hyperparams.batch_size
     data_len = len(test_x1_char)
     num_batch = int((data_len) / batch_size)
 
@@ -180,7 +184,7 @@ def test():
             model.inputX_word: test_x1_word[start_id:end_id],
             model.inputX_char: test_x1_char[start_id:end_id],
             model.inputY_word: test_x2_word[start_id:end_id],
-            model.inputY_word: test_x2_char[start_id:end_id],
+            model.inputY_char: test_x2_char[start_id:end_id],
             model.y: test_y,
             model.dropout_rate: 1.0   #这个表示测试时不使用dropout对神经元过滤
         }
@@ -200,7 +204,7 @@ def test():
     print("Time usage:", time_dif)
     return y_test_cls,y_pred_cls
 
-train()
-# y_test_cls,y_pred_cls = test()
+# train()
+y_test_cls,y_pred_cls = test()
 # wsnamels = getwslist(model=model)
 # wsevaluate(y_test_cls, y_pred_cls,wsnamels)

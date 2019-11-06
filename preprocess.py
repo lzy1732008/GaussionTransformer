@@ -70,7 +70,7 @@ def setUp_inputs(trainPath = None, valPath = None, testPath = None):
     assert len(wordVocab) == hp.Hyperparams.word_vocab_size, ValueError('the number of char vocab is wrong, {0}'.format(len(wordVocab)))
 
 
-    fw = open('resource/inputs.json', 'w',encoding='utf-8')
+    # fw = open('resource/inputs_simpleRun.json', 'w',encoding='utf-8')
     train = ""
     test = ""
     val = ""
@@ -81,7 +81,8 @@ def setUp_inputs(trainPath = None, valPath = None, testPath = None):
     if valPath:
        val = _setUp_inputs_(valPath, wordEmbedding, wordVocab, charEmbedding, charVocab)
     env = {'train': train, 'test': test, 'val': val}
-    json.dump(env, fw)
+    return env
+    # json.dump(env, fw)
 
 
 def _setUp_inputs_(sourcePath, wordEmbedding, wordVocab, charEmbedding,charVocab):
@@ -163,7 +164,7 @@ def buildWordEembeddingFile():
         assert '<UNK>' in w2v_dict.keys(), ValueError('space and unk not in word dict')
         json.dump(w2v_dict, fw)
 
-# buildWordEembeddingFile()
+# # buildWordEembeddingFile()
 # trainPath = 'resource/train-原始.txt'
 # valPath = 'resource/val-原始.txt'
 # testPath = 'resource/test-原始.txt'

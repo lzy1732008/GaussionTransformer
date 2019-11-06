@@ -9,10 +9,9 @@ class Hyperparams:
     '''Hyperparameters'''
     is_training = True
     # data
-    source_train = 'corpora/train.tags.de-en.de'
-    target_train = 'corpora/train.tags.de-en.en'
-    source_test = 'corpora/IWSLT16.TED.tst2014.de-en.de.xml'
-    target_test = 'corpora/IWSLT16.TED.tst2014.de-en.en.xml'
+    trainPath = 'resource/train-原始.txt'
+    valPath = 'resource/val-原始.txt'
+    testPath = 'resource/test-原始.txt'
     char_vocab_size = 4594 # *
     word_vocab_size = 97505
     char_dimension = 30
@@ -24,7 +23,7 @@ class Hyperparams:
     batch_size = 64 # alias = N
     lr = 4e-5 # learning rate. In paper, learning rate is adjusted to the global step.
     logdir = 'logdir' # log directory
-    num_epochs = 20
+    num_epochs = 200
     save_per_batch = 100
     print_per_batch = 10
 
@@ -41,6 +40,7 @@ class Hyperparams:
     dropout_rate = 0.1
     encoder_num_blocks = 3 # number of encoder/decoder blocks
     inter_num_blocks = 2
+
 
 
     

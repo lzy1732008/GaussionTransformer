@@ -9,11 +9,11 @@ https://www.github.com/kyubyong/transformer
 from __future__ import print_function
 import tensorflow as tf
 import numpy as np
-import hyperparams as param
+import hyperparams as hp
 
-#Batch Normalization
+#layer Normalization
 def normalize(inputs, 
-              epsilon = 1e-8,
+              epsilon = 1e-5,
               scope="ln",
               reuse=None):
     '''Applies layer normalization.
@@ -37,7 +37,7 @@ def normalize(inputs,
         beta = tf.Variable(tf.zeros(params_shape,dtype=tf.float64),dtype=tf.float64)
         gamma = tf.Variable(tf.ones(params_shape,dtype=tf.float64),dtype=tf.float64)
         normalized = (inputs - mean) / ((variance + epsilon) ** (.5))
-        outputs = gamma * normalized + beta
+        outputs = normalized
         
     return outputs
 
@@ -225,8 +225,13 @@ def embedding_block(input_words,
     with tf.variable_scope(scope, reuse=reuse):
         if num_units is None:
             num_units = position_encoding.get_shape().as_list()[-1]
-        inputs = tf.concat([input_words, input_char], axis=2)
-        outputs = position_encoding + tf.layers.dense(inputs=inputs, units=num_units, name="feedforward")
+            print('position_encoding:',position_encoding.get_shape())
+        inputs = tf.concat([input_words, input_char], axis=-1)
+
+        W = tf.Variable(tf.random_normal([hp.Hyperparams.char_dimension + hp.Hyperparams.word_dimension, num_units],
+                                     stddev=0, seed=1,dtype=tf.float64), trainable=True, name='w',dtype=tf.float64)
+        outputs = position_encoding + tf.einsum('abc,cd->abd',inputs,W)
+        tf.check_numerics(outputs,"output of embedding is nan")
         return outputs
 
 
@@ -256,6 +261,7 @@ def Gaussion_selfAttention(queries,
 
         # Multiplication
         outputs = tf.matmul(Q_, tf.transpose(K_, [0, 2, 1]))  # (h*N, T_q, T_k)
+        outputs = tf.check_numerics(outputs, "Gaussion self-attention  step 1 is nan")
 
         Nq, T_q, Cq = Q.get_shape().as_list()
         Nk, T_k, Ck = K.get_shape().as_list()
@@ -276,6 +282,8 @@ def Gaussion_selfAttention(queries,
             dis_M_ = tf.tile(tf.expand_dims(dis_M, 0), [Nq * num_heads, 1, 1])  # (h * N, T_q, T_k)
 
             outputs = (dis_M_ + outputs) / (K_.get_shape().as_list()[-1] ** 0.5)  # (h * N, T_q, T_k)
+
+            outputs = tf.check_numerics(outputs,"Gaussion self-attention  step 2 is nan")
         else:
             outputs = outputs / (K_.get_shape().as_list()[-1] ** 0.5)
 
@@ -298,6 +306,7 @@ def Gaussion_selfAttention(queries,
 
         # Activation
         outputs = tf.nn.softmax(outputs)  # (h*N, T_q, T_k)
+        outputs = tf.check_numerics(outputs, "Gaussion self-attention  step 3 is nan")
 
         # # Query Masking
         # query_masks = tf.sign(tf.abs(tf.reduce_sum(queries, axis=-1))) # (N, T_q)
@@ -306,15 +315,19 @@ def Gaussion_selfAttention(queries,
         # outputs *= query_masks # broadcasting. (N, T_q, C)
         #
         # Dropouts
-        outputs = tf.layers.dropout(outputs, rate=dropout_rate, training=tf.convert_to_tensor(is_training))
+        # outputs = tf.layers.dropout(outputs, rate=dropout_rate, training=is_training)
+        outputs = tf.check_numerics(outputs, "Gaussion self-attention  step 4 is nan")
 
         # Weighted sum
         outputs = tf.matmul(outputs, V_)  # ( h*N, T_q, C/h)
+        outputs = tf.check_numerics(outputs, "Gaussion self-attention  step 5 is nan")
 
         # add and layer norm
         outputs = tf.concat(tf.split(outputs, num_heads, axis=0), axis=2)  # (h, T_q, C)
         outputs += queries
+        outputs = tf.check_numerics(outputs, "Gaussion self-attention  step 6 is nan")
         outputs = normalize(outputs)  # (N, T_q, C)
+        outputs = tf.check_numerics(outputs, "Gaussion self-attention  step 7 is nan")
     return outputs
 
 def multihead_attention(inputs,
@@ -360,13 +373,25 @@ def multihead_attention(inputs,
                                          num_heads=num_heads,
                                          dropout_rate=dropout_rate,
                                          is_training=is_training)
+
+        outputs = tf.check_numerics(outputs,"outputs step 1 is nan")
         # feedforward
         outputs_ff = tf.nn.relu(tf.layers.dense(inputs=outputs,units=num_units,name="ffn_1"))
+
+        outputs_ff = tf.check_numerics(outputs_ff, "outputs step 2 is nan")
+
         outputs_ff = tf.layers.dense(inputs=outputs_ff, units=num_units, name="ffn_2")
+
+        outputs_ff = tf.check_numerics(outputs_ff, "outputs step 3 is nan")
 
         # add and Layer norm
         outputs += outputs_ff #(N, T_q, C)
+
+        outputs = tf.check_numerics(outputs, "outputs step 4 is nan")
+
         outputs = normalize(outputs) #(N, T_q, C)
+
+        outputs = tf.check_numerics(outputs, "outputs step 4 is nan")
 
         return outputs
 
@@ -450,7 +475,7 @@ def ComparisonBlock(input1_Interaction,
 
         concat_output = tf.concat([output1,output2],axis=-1)
         output_ff = tf.nn.relu(tf.layers.dense(inputs=concat_output,units=dimension1,name="predict_dense_1"))
-        output = tf.nn.softmax(tf.layers.dense(inputs=output_ff,units=2,name="predict_dense_2"))
+        output = tf.layers.dense(inputs=output_ff,units=2,name="predict_dense_2")
     return output
 
 def preComparison(input_interaction,

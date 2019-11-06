@@ -33,9 +33,9 @@ import numpy as np
 
 
 import Model
-inputX_word = np.random.rand(64,100,300)
+inputX_word = np.random.rand(64,100,128)
 inputX_char = np.random.rand(64,100,30)
-inputY_word = np.random.rand(64,100,300)
+inputY_word = np.random.rand(64,100,128)
 inputY_char = np.random.rand(64,100,30)
 input_y = [[0, 1] for _ in range(64)]
 
@@ -45,7 +45,9 @@ feed_dict = {
         model.inputX_char: inputX_char,
         model.inputY_word: inputY_word,
         model.inputY_char: inputY_char,
-        model.y: input_y
+        model.y: input_y,
+        model.dropout_rate: 0.8,
+        model.is_training: True
     }
 
 

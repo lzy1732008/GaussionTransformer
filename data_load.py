@@ -44,10 +44,8 @@ def get_batch_data(a_word,a_char,b_word,b_char,y,batch_size = 64):
               y_shuffle[start_id:end_id]
 
 
-def data_load(envPath):
-    with open(envPath,'r',encoding='utf-8') as fr:
-        env = json.load(fr)
-
+def data_load():
+    env = prep.setUp_inputs(trainPath=hp.Hyperparams.trainPath, valPath=hp.Hyperparams.valPath, testPath=hp.Hyperparams.testPath)
     train_data = env['train']
     test_data = env['test']
     val_data = env['val']
@@ -55,6 +53,14 @@ def data_load(envPath):
     test = processInitData(test_data)
     val = processInitData(val_data)
     return train,test,val
+
+def data_load_test():
+    env = prep.setUp_inputs(trainPath=None, valPath=None,
+                            testPath=hp.Hyperparams.testPath)
+    test_data = env['test']
+    test = processInitData(test_data)
+    return test
+
 
 #process data from env
 def processInitData(data):

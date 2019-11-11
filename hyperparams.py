@@ -9,9 +9,9 @@ class Hyperparams:
     '''Hyperparameters'''
     is_training = True
     # data
-    trainPath = 'resource/train-原始.txt'
-    valPath = 'resource/val-原始.txt'
-    testPath = 'resource/test-原始.txt'
+    trainPath = 'resource/train-init.txt'
+    valPath = 'resource/val-init.txt'
+    testPath = 'resource/test-init.txt'
     char_vocab_size = 4594 # *
     word_vocab_size = 97505
     char_dimension = 30

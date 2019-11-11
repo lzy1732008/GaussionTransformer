@@ -15,9 +15,9 @@ from data_load import *
 import hyperparams as hp
 
 save_dir = 'result/model/GaussionTransformer'  #修改处
-times = '1'
-save_path = os.path.join(save_dir,times+'/checkpoints/best_validation')
-tensorboard_dir = os.path.join(save_dir,times+'/tensorboard')
+param_des = 'encoder-2'
+save_path = os.path.join(save_dir,param_des+'/checkpoints/best_validation')
+tensorboard_dir = os.path.join(save_dir,param_des+'/tensorboard')
 
 model = GaussionTransformer()
 
@@ -204,7 +204,7 @@ def test():
     print("Time usage:", time_dif)
     return y_test_cls,y_pred_cls
 
-# train()
-y_test_cls,y_pred_cls = test()
+train()
+# y_test_cls,y_pred_cls = test()
 # wsnamels = getwslist(model=model)
 # wsevaluate(y_test_cls, y_pred_cls,wsnamels)

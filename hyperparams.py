@@ -38,7 +38,7 @@ class Hyperparams:
     #model param
     num_heads = 4
     dropout_rate = 0.1
-    encoder_num_blocks = 3 # number of encoder/decoder blocks
+    encoder_num_blocks = 2 # number of encoder/decoder blocks
     inter_num_blocks = 2
 
 

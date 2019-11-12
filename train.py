@@ -15,7 +15,7 @@ from data_load import *
 import hyperparams as hp
 
 save_dir = 'result/model/GaussionTransformer'  #修改处
-param_des = 'encoder-2@inter-3@dp-0.5'
+param_des = 'encoder-2@inter-3@dp-0.5@x_maxLen-30@y_maxLen-30'
 save_path = os.path.join(save_dir,param_des+'/checkpoints/best_validation')
 tensorboard_dir = os.path.join(save_dir,param_des+'/tensorboard')
 

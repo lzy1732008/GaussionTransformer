@@ -30,8 +30,8 @@ class Hyperparams:
 
     # model
     # input param
-    X_maxlen = 100 # Maximum number of words in a sentence. alias = T. *
-    Y_maxLen = 100 #*
+    X_maxlen = 30 # Maximum number of words in a sentence. alias = T. *
+    Y_maxLen = 30 #*
 
     min_cnt = 20 # words whose occurred less than min_cnt are encoded as <UNK>.
 

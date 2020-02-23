@@ -204,8 +204,66 @@ def test():
     print("Time usage:", time_dif)
     return y_test_cls,y_pred_cls
 
+def getwslist():
+    lines = open(hp.Hyperparams.testPath,'r',encoding='utf-8').read().split('\n')
+    namels = []
+    for i in range(len(lines)):
+        line = lines[i]
+        if line.strip() == "":
+            continue
+        array = line.split('|')
+
+        if len(array) < 4:
+            continue
+
+        namels.append(array[0])
+    return namels
+
+def wsevaluate(y_pred_cls,y_test_cls,wslist):
+    print('y_pred_cls.len:',len(y_pred_cls))
+    print('y_test_cls.len',len(y_test_cls))
+    print('wslist.len:',len(wslist))
+    pred_true = {}
+    positive = {}
+    pred_pos = {}
+
+    for i in range(len(y_test_cls)):
+        if pred_pos.get(wslist[i].strip()) == None:
+            pred_pos[wslist[i].strip()] = 0
+        if pred_true.get(wslist[i].strip()) == None:
+            pred_true[wslist[i].strip()] = 0
+        if positive.get(wslist[i].strip()) == None:
+            positive[wslist[i].strip()] = 0
+
+        if y_pred_cls[i] == 1:
+            pred_pos[wslist[i]] += 1
+        if y_test_cls[i] == 1:
+            positive[wslist[i]] += 1
+        if y_test_cls[i] == y_pred_cls[i] and y_pred_cls[i] == 1:
+            pred_true[wslist[i]] += 1
+
+    F1_ls = []
+    wslist = list(set(wslist))
+    for wsname in wslist:
+        # print(pred_pos[wsname.strip()],positive[wsname.strip()],pred_true[wsname.strip()])
+        if positive[wsname.strip()] == 0:
+            print('Failed')
+            continue
+        else:
+            recall = pred_true[wsname.strip()] / (positive[wsname.strip()])
+            if pred_pos[wsname.strip()] == 0:
+               precision = 0
+            else:
+               precision = pred_true[wsname.strip()]/(pred_pos[wsname.strip()])
+            if recall + precision == 0:
+                F1 = 0
+            else:
+                F1 = (2*recall*precision)/(precision+recall)
+            F1_ls.append(F1)
+            # print('F1:',F1)
+    print('Document F1:',np.mean(np.array(F1_ls)))
 
 # train()
 y_test_cls,y_pred_cls = test()
-# wsnamels = getwslist(model=model)
-# wsevaluate(y_test_cls, y_pred_cls,wsnamels)
+wsnamels = getwslist()
+wsevaluate(y_pred_cls,y_test_cls,wsnamels)

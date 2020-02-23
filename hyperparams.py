@@ -11,7 +11,7 @@ class Hyperparams:
     # data
     trainPath = 'resource/train-init.txt'
     valPath = 'resource/val-init.txt'
-    testPath = 'resource/test-init.txt'
+    testPath = 'resource/test-init-alter-5.txt'
     char_vocab_size = 4594 # *
     word_vocab_size = 97505
     char_dimension = 30

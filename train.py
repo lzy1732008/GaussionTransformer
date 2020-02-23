@@ -15,7 +15,7 @@ from data_load import *
 import hyperparams as hp
 
 save_dir = 'result/model/GaussionTransformer'  #修改处
-param_des = 'encoder-2@inter-3@dp-0.5@x_maxLen-30@y_maxLen-30'
+param_des = 'gyshz-encoder-2@inter-3@dp-0.5@x_maxLen-30@y_maxLen-30'
 save_path = os.path.join(save_dir,param_des+'/checkpoints/best_validation')
 tensorboard_dir = os.path.join(save_dir,param_des+'/tensorboard')
 
@@ -263,7 +263,7 @@ def wsevaluate(y_pred_cls,y_test_cls,wslist):
             # print('F1:',F1)
     print('Document F1:',np.mean(np.array(F1_ls)))
 
-# train()
+train()
 y_test_cls,y_pred_cls = test()
 wsnamels = getwslist()
 wsevaluate(y_pred_cls,y_test_cls,wsnamels)
